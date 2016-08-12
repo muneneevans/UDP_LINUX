@@ -19,10 +19,15 @@ void die(char *s)
  
 int main(void)
 {
+	int clients[10], clientcount , found , client;
     struct sockaddr_in si_me, si_other;
      
     int s, i, slen = sizeof(si_other) , recv_len;
-    char buf[BUFLEN];
+    char buf[BUFLEN] , outbuffer[256] , clientport[5];
+     
+    //initiate client count
+    clientcount = 0 ; 
+    found = 0 ;
      
     //create a UDP socket
     if ((s=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
@@ -58,12 +63,49 @@ int main(void)
         //print details of the client/peer and the data received
         printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
         printf("Data: %s\n" , buf);
+        
+        client = atoi(buf);
+        printf("clientport : %d\n" , client);
          
         //now reply the client with the same data
-        if (sendto(s, buf, recv_len, 0, (struct sockaddr*) &si_other, slen) == -1)
-        {
-            die("sendto()");
-        }
+        //if (sendto(s, buf, recv_len, 0, (struct sockaddr*) &si_other, slen) == -1)
+        //{
+        //    die("sendto()");
+        //}
+        
+        
+        
+        for( i = 0 ; i <= clientcount ; i++)
+		{
+			
+			if(clients[i] == client )
+			{ 
+				found = 1 ;
+			} 
+		}
+		if(found == 0)
+		{
+			printf("found");
+			clients[clientcount] = client ;
+			clientcount++ ;
+		}
+        
+        
+        
+        printf("\n\nclients \n");
+        bzero(outbuffer , 256);
+        bzero(clientport , 5);
+        for( i = 0 ; i < clientcount ; i++)
+		{
+			printf("%d\n" , clients[i] ); 
+			sprintf(clientport , "%d" , clients[i]);
+			strcat(outbuffer, clientport);
+			strcat(outbuffer, ",");
+			
+		}
+		printf("\n%s" , outbuffer);
+        
+        
     }
  
     close(s);

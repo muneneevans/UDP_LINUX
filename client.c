@@ -18,13 +18,15 @@ void die(char *s)
     exit(1);
 }
  
-int main(void)
+void Connect(int port)
 {
     struct sockaddr_in si_other;
     int s, i, slen=sizeof(si_other);
     char buf[BUFLEN];
     char message[BUFLEN];
  
+ 
+	printf("connecting  \n");
     if ( (s=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
     {
         die("socket");
@@ -40,10 +42,12 @@ int main(void)
         exit(1);
     }
  
-    while(1)
-    {
+	
+    
+		printf("connecting");
         printf("Enter message : ");
-        gets(message);
+        sprintf(message , "%d" , port);
+        //gets(message);
          
         //send the message
         if (sendto(s, message, strlen(message) , 0 , (struct sockaddr *) &si_other, slen)==-1)
@@ -61,8 +65,23 @@ int main(void)
         }
          
         puts(buf);
-    }
+    
  
     close(s);
-    return 0;
+    
 }
+
+int main()
+{
+	int myport ; 
+	myport = 0 ;
+	printf("please enter your port\n");
+	scanf("%d", &myport);
+	
+	printf("gonna connect");
+	Connect(myport);
+	getchar();
+	
+	return 0 ;
+	}
+
