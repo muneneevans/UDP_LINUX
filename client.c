@@ -22,11 +22,15 @@ void Connect(int port)
 {
     struct sockaddr_in si_other;
     int s, i, slen=sizeof(si_other);
+    int peers[10] , peercount , found ;
     char buf[BUFLEN];
     char message[BUFLEN];
- 
+	char* token; 
  
 	
+	
+	peercount = 0 ;
+	found = 0 ;
     if ( (s=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
     {
         die("socket");
@@ -66,6 +70,21 @@ void Connect(int port)
 		
 		printf("response\n");
         puts(buf);
+        
+        
+        token = strtok(buf, ",");
+		while(token != NULL)
+		{
+			peers[peercount] = atoi(token);		
+			token = strtok(NULL, ",");
+			peercount++ ; 
+		}
+		
+		printf("\n peers");
+		for( i = 0 ; i < peercount ; i ++)
+		{
+			printf("\n %d" , peers[i]);
+			}
     
  
     close(s);
