@@ -48,10 +48,12 @@ int main(void)
         die("bind");
     }
      
+    printf("server is listening");
+     
     //keep listening for data
     while(1)
     {
-        printf("Waiting for data...");
+        
         fflush(stdout);
          
         //try to receive some data, this is a blocking call
@@ -65,7 +67,7 @@ int main(void)
         printf("Data: %s\n" , buf);
         
         client = atoi(buf);
-        printf("clientport : %d\n" , client);
+        printf("new client is : %d\n" , client);
          
         
         for( i = 0 ; i <= clientcount ; i++)
@@ -77,8 +79,7 @@ int main(void)
 			} 
 		}
 		if(found == 0)
-		{
-			printf("found");
+		{			
 			clients[clientcount] = client ;
 			clientcount++ ;
 		}
