@@ -26,7 +26,7 @@ void Connect(int port)
     char message[BUFLEN];
  
  
-	printf("connecting  \n");
+	
     if ( (s=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
     {
         die("socket");
@@ -63,7 +63,8 @@ void Connect(int port)
         {
             die("recvfrom()");
         }
-         
+		
+		printf("response\n");
         puts(buf);
     
  

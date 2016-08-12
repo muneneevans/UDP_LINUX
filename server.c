@@ -67,13 +67,6 @@ int main(void)
         client = atoi(buf);
         printf("clientport : %d\n" , client);
          
-        //now reply the client with the same data
-        //if (sendto(s, buf, recv_len, 0, (struct sockaddr*) &si_other, slen) == -1)
-        //{
-        //    die("sendto()");
-        //}
-        
-        
         
         for( i = 0 ; i <= clientcount ; i++)
 		{
@@ -105,6 +98,12 @@ int main(void)
 		}
 		printf("\n%s" , outbuffer);
         
+        
+        //reply
+        if (sendto(s, outbuffer, strlen(outbuffer), 0, (struct sockaddr*) &si_other, slen) == -1)
+        {
+            die("sendto()");
+        }
         
     }
  
