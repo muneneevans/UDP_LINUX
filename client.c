@@ -96,7 +96,7 @@ void Connect(int port)
     
 }
 
-int Listen(int port)
+void *StartListening(void *port)
 {
 	int clients[10], clientcount , found , client;
     struct sockaddr_in si_me, si_other;
@@ -114,11 +114,12 @@ int Listen(int port)
         die("socket");
     }
      
+    printf("listening on port");
     // zero out the structure
     memset((char *) &si_me, 0, sizeof(si_me));
      
     si_me.sin_family = AF_INET;
-    si_me.sin_port = htons(port);
+    si_me.sin_port = htons((int)port);
     si_me.sin_addr.s_addr = htonl(INADDR_ANY);
      
     //bind socket to port
@@ -129,8 +130,7 @@ int Listen(int port)
      
     //keep listening for data
     while(1)
-    {
-        printf("Waiting for data...");
+    {        
         fflush(stdout);
          
         //try to receive some data, this is a blocking call
@@ -156,18 +156,82 @@ int Listen(int port)
     }
  
     close(s);
-    return 0;
+    return NULL;
 }
+
+ 
+void ConnectToPeer(int port)
+{
+    struct sockaddr_in si_other;
+    int s, i, slen=sizeof(si_other);
+    int peers[10], finalpeers[10] , peercount , found ;
+    char buf[BUFLEN];
+    char message[BUFLEN];
+	char* token; 
+ 
+	
+	
+	peercount = 0 ;
+	found = 0 ;
+    if ( (s=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
+    {
+        die("socket");
+    }
+ 
+    memset((char *) &si_other, 0, sizeof(si_other));
+    si_other.sin_family = AF_INET;
+    si_other.sin_port = htons(port);
+     
+    if (inet_aton(SERVER , &si_other.sin_addr) == 0) 
+    {
+        fprintf(stderr, "inet_aton() failed\n");
+        exit(1);
+    }
+ 
+	
+    
+		printf("connecting");
+        printf("Enter message : ");       
+        gets(message);
+         
+        //send the message
+        if (sendto(s, message, strlen(message) , 0 , (struct sockaddr *) &si_other, slen)==-1)
+        {
+            die("sendto()");
+        }
+         
+        //receive a reply and print it
+        //clear the buffer by filling null, it might have previously received data
+        memset(buf,'\0', BUFLEN);
+        //try to receive some data, this is a blocking call
+        if (recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen) == -1)
+        {
+            die("recvfrom()");
+        }
+		
+		printf("response\n");
+        puts(buf);
+        
+               
+    close(s);
+    
+}
+
+
 
 
 
 int main()
 {
-	int myport , option; 
+	int myport , option , peerno; 
 	myport = 0 ;
 	
 	printf("please enter your port\n");
 		scanf("%d", &myport);
+		
+	pthread_t pth ;
+	pthread_create(&pth , NULL , StartListening , (void*)myport);	
+	
 	
 	while(1){
 		
@@ -184,6 +248,9 @@ int main()
 			break ;
 			
 			case 2 :
+				printf("\nselect a peer port: ");
+				scanf("%d ", &peerno);
+				ConnectToPeer(peerno);
 			break ;
 			
 			case 3:
